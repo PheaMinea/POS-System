@@ -1,14 +1,22 @@
+# ================================
+# Stage 1: Build Frontend
+# ================================
 FROM node:22-alpine AS frontend
 
 WORKDIR /app
 
 COPY package*.json ./
+
 RUN npm install
 
 COPY . .
+
 RUN npm run build
 
 
+# ================================
+# Stage 2: Laravel PHP Apache
+# ================================
 FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
@@ -46,7 +54,7 @@ RUN composer install \
     --no-interaction \
     --no-scripts
 
-COPY --from=frontend /app/public/build ./public/build
+COPY --from=frontend /app/public/build /var/www/html/public/build
 
 RUN mkdir -p \
     storage/framework/cache/data \
@@ -56,22 +64,23 @@ RUN mkdir -p \
     bootstrap/cache
 
 RUN chown -R www-data:www-data \
-    storage \
-    bootstrap/cache \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache \
     && chmod -R 775 \
-    storage \
-    bootstrap/cache
-
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
 
 RUN sed -ri \
-    -e 's!/var/www/html!/var/www/html/public!g' \
-    /etc/apache2/sites-available/*.conf
+    's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#g' \
+    /etc/apache2/sites-available/000-default.conf
 
-RUN sed -ri \
-    -e 's!/var/www/!/var/www/html/public!g' \
-    /etc/apache2/apache2.conf \
-    /etc/apache2/conf-available/*.conf
+RUN printf '<Directory /var/www/html/public>\n\
+    Options Indexes FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>\n' \
+    > /etc/apache2/conf-available/laravel.conf \
+    && a2enconf laravel
 
 EXPOSE 80
 
