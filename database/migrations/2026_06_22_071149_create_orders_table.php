@@ -22,7 +22,17 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->decimal('total_price', 10, 2);
+            // Order source/type
+            $table->string('order_type')
+                ->default('online');
+
+            // Total order price
+            $table->decimal('total_price', 10, 2)
+                ->default(0);
+
+            // Order status
+            $table->string('status')
+                ->default('pending_payment');
 
             $table->timestamps();
         });

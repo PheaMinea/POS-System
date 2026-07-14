@@ -62,6 +62,21 @@ Route::get('/products/{product}', [
 
 /*
 |--------------------------------------------------------------------------
+| Customer Bakong Payment Verify
+|--------------------------------------------------------------------------
+|
+| Customer checkout popup uses this route to check Bakong payment.
+| This route must be outside cashier middleware.
+|
+*/
+
+Route::post('/payments/{id}/verify', [
+    PaymentController::class,
+    'verify'
+])->name('payments.verify');
+
+/*
+|--------------------------------------------------------------------------
 | Protected Routes
 |--------------------------------------------------------------------------
 */
@@ -146,7 +161,6 @@ Route::middleware([
         'payments',
         PaymentController::class
     );
-
 });
 
 /*

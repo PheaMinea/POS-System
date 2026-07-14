@@ -528,7 +528,10 @@
     });
 </script>
 
-@stack('scripts')
+    <!-- SPA Router - Prevents page refreshes -->
+    <script src="{{ asset('js/spa.js') }}"></script>
+
+    @stack('scripts')
 
 </body>
 </html>

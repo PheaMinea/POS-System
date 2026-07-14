@@ -11,7 +11,11 @@ class Order extends Model
         'user_id',
         'order_type',
         'total_price',
-        'status'
+        'status',
+    ];
+
+    protected $casts = [
+        'total_price' => 'decimal:2',
     ];
 
     public function customer()
@@ -26,11 +30,19 @@ class Order extends Model
 
     public function orderItems()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(
+            OrderItem::class,
+            'order_id',
+            'id'
+        );
     }
 
     public function payment()
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasOne(
+            Payment::class,
+            'order_id',
+            'id'
+        );
     }
 }

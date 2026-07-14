@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends BaseApiController
 {
+    /**
+     * Display all orders.
+     */
     public function index()
     {
         try {
@@ -17,8 +20,11 @@ class OrderController extends BaseApiController
             $orders = Order::with([
                 'customer',
                 'user',
-                'orderItems.product'
-            ])->latest()->get();
+                'orderItems.product',
+                'payment',
+            ])
+                ->latest()
+                ->get();
 
             return $this->success(
                 $orders,
@@ -31,10 +37,12 @@ class OrderController extends BaseApiController
                 $e->getMessage(),
                 500
             );
-
         }
     }
 
+    /**
+     * Display single order.
+     */
     public function show(Order $order)
     {
         try {
@@ -43,7 +51,7 @@ class OrderController extends BaseApiController
                 'customer',
                 'user',
                 'orderItems.product',
-                'payment'
+                'payment',
             ]);
 
             return $this->success(
@@ -57,53 +65,121 @@ class OrderController extends BaseApiController
                 $e->getMessage(),
                 500
             );
-
         }
     }
 
+    /**
+     * Create POS order.
+     *
+     * This method is for POS/Admin orders.
+     * Customer Bakong checkout should use CheckoutController.
+     */
     public function store(Request $request)
     {
         DB::beginTransaction();
 
         try {
 
-            $request->validate([
-                'customer_id' => 'required|exists:customers,id',
-                'total_price' => 'required|numeric|min:0',
-                'items' => 'required|array|min:1',
+            $validated = $request->validate([
+                'customer_id' => [
+                    'required',
+                    'exists:customers,id',
+                ],
 
-                'items.*.product_id' => 'required|exists:products,id',
-                'items.*.quantity'   => 'required|integer|min:1',
-                'items.*.price'      => 'required|numeric|min:0',
+                'items' => [
+                    'required',
+                    'array',
+                    'min:1',
+                ],
+
+                'items.*.product_id' => [
+                    'required',
+                    'exists:products,id',
+                ],
+
+                'items.*.quantity' => [
+                    'required',
+                    'integer',
+                    'min:1',
+                ],
             ]);
 
-            $order = Order::create([
-                'customer_id' => $request->customer_id,
-                'user_id'     => auth()->id(),
-                'total_price' => $request->total_price,
-            ]);
+            /*
+            |--------------------------------------------------------------------------
+            | Calculate total from database
+            |--------------------------------------------------------------------------
+            |
+            | Do not trust total_price or product price from frontend.
+            |
+            */
 
-            foreach ($request->items as $item) {
+            $totalPrice = 0;
+
+            $products = [];
+
+            foreach ($validated['items'] as $item) {
 
                 $product = Product::findOrFail(
                     $item['product_id']
                 );
 
                 if ($product->stock < $item['quantity']) {
+
                     throw new \Exception(
                         "{$product->name} stock not enough."
                     );
                 }
 
+                $subtotal = (float) $product->price
+                    * (int) $item['quantity'];
+
+                $totalPrice += $subtotal;
+
+                $products[] = [
+                    'product' => $product,
+                    'quantity' => (int) $item['quantity'],
+                    'price' => (float) $product->price,
+                    'subtotal' => $subtotal,
+                ];
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create POS order
+            |--------------------------------------------------------------------------
+            */
+
+            $order = Order::create([
+                'customer_id' => $validated['customer_id'],
+                'user_id' => auth()->id(),
+                'order_type' => 'pos',
+                'total_price' => $totalPrice,
+                'status' => 'paid',
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create order items
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($products as $item) {
+
                 OrderItem::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $product->id,
-                    'quantity'   => $item['quantity'],
-                    'price'      => $item['price'],
-                    'subtotal'   => $item['quantity'] * $item['price'],
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['subtotal'],
                 ]);
 
-                $product->decrement(
+                /*
+                |--------------------------------------------------------------------------
+                | POS order can deduct stock immediately
+                |--------------------------------------------------------------------------
+                */
+
+                $item['product']->decrement(
                     'stock',
                     $item['quantity']
                 );
@@ -115,11 +191,18 @@ class OrderController extends BaseApiController
                 $order->load([
                     'customer',
                     'user',
-                    'orderItems.product'
+                    'orderItems.product',
+                    'payment',
                 ]),
                 'Order Created Successfully',
                 201
             );
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            DB::rollBack();
+
+            throw $e;
 
         } catch (\Exception $e) {
 
@@ -129,30 +212,66 @@ class OrderController extends BaseApiController
                 $e->getMessage(),
                 500
             );
-
         }
     }
 
+    /**
+     * Delete order.
+     */
     public function destroy(Order $order)
     {
         DB::beginTransaction();
 
         try {
 
-            $order->load('orderItems');
+            $order->load([
+                'orderItems',
+                'payment',
+            ]);
 
-            foreach ($order->orderItems as $item) {
+            /*
+            |--------------------------------------------------------------------------
+            | Restore stock only when stock was deducted
+            |--------------------------------------------------------------------------
+            */
 
-                Product::where(
-                    'id',
-                    $item->product_id
-                )->increment(
-                    'stock',
-                    $item->quantity
-                );
+            if ($order->status === 'paid') {
+
+                foreach ($order->orderItems as $item) {
+
+                    Product::where(
+                        'id',
+                        $item->product_id
+                    )->increment(
+                        'stock',
+                        $item->quantity
+                    );
+                }
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | Delete payment
+            |--------------------------------------------------------------------------
+            */
+
+            if ($order->payment) {
+                $order->payment->delete();
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Delete order items
+            |--------------------------------------------------------------------------
+            */
+
             $order->orderItems()->delete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Delete order
+            |--------------------------------------------------------------------------
+            */
 
             $order->delete();
 
@@ -171,7 +290,6 @@ class OrderController extends BaseApiController
                 $e->getMessage(),
                 500
             );
-
         }
     }
 }

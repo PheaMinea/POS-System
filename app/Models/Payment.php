@@ -16,11 +16,16 @@ class Payment extends Model
     ];
 
     protected $casts = [
+        'amount' => 'decimal:2',
         'telegram_sent_at' => 'datetime',
     ];
 
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(
+            Order::class,
+            'order_id',
+            'id'
+        );
     }
 }

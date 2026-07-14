@@ -42,6 +42,7 @@ return [
         'token' => env('BAKONG_TOKEN'),
         'merchant_id' => env('BAKONG_MERCHANT_ID'),
         'merchant_account_id' => env('BAKONG_MERCHANT_ACCOUNT_ID'),
+        'customer_auto_confirm' => env('BAKONG_CUSTOMER_AUTO_CONFIRM', false),
     ],
 
     /*

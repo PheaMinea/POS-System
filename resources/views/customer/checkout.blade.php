@@ -203,15 +203,88 @@
 
 </section>
 
+<div id="bakongPaymentModal" class="fixed inset-0 z-[10000] hidden items-center justify-center bg-slate-900/70 px-4 py-6">
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-6 py-4">
+            <div>
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-qrcode text-blue-500"></i>
+                    Bakong KHQR Payment
+                </h3>
+                <p class="text-sm text-slate-400">Scan QR and wait for automatic verification</p>
+            </div>
+            <button type="button" id="closeBakongModal" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 p-6">
+            <div class="text-center">
+                <div class="bg-slate-50 rounded-2xl p-5 inline-block border border-slate-100">
+                    <div id="bakongQrBox" class="w-64 h-64 flex items-center justify-center mx-auto">
+                        <div class="text-slate-400">
+                            <i class="fas fa-spinner fa-spin text-3xl"></i>
+                            <p class="text-sm mt-2">Generating QR...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wider text-blue-500 font-bold">Amount</p>
+                    <p id="bakongAmount" class="text-3xl font-extrabold text-blue-700">$0.00</p>
+                </div>
+                <div class="mt-3 rounded-xl bg-slate-50 border border-slate-100 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wider text-slate-400 font-bold">Reference</p>
+                    <p id="bakongReference" class="text-sm font-mono font-bold text-slate-700 break-all">-</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="space-y-3 text-sm text-slate-600">
+                    <div class="flex items-start gap-3 rounded-xl bg-slate-50 p-3">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">1</span>
+                        <span>Open Bakong app and scan the QR code.</span>
+                    </div>
+                    <div class="flex items-start gap-3 rounded-xl bg-slate-50 p-3">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">2</span>
+                        <span>Confirm the exact payment amount.</span>
+                    </div>
+                    <div class="flex items-start gap-3 rounded-xl bg-slate-50 p-3">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">3</span>
+                        <span>This system will verify the Bakong transaction automatically.</span>
+                    </div>
+                </div>
+
+                <div id="bakongStatus" class="mt-5 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-700">
+                    Waiting for customer payment...
+                </div>
+
+                <button type="button" id="manualVerifyBakongBtn"
+                        class="mt-4 w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fas fa-rotate-right"></i>
+                    Check Payment Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ============================================================ -->
 <!-- SCRIPTS -->
 <!-- ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
-    const CART_STORAGE_KEY = 'shared_cart';
+    window.customerCartStorageKey = 'shared_cart';
+    window.bakongPaymentState = window.bakongPaymentState || {
+        verifyUrl: null,
+        orderUrl: null,
+        interval: null,
+        isChecking: false,
+        isPaid: false,
+    };
 
     function getCart() {
         try {
-            const data = localStorage.getItem(CART_STORAGE_KEY) || localStorage.getItem('cart');
+            const data = localStorage.getItem(window.customerCartStorageKey) || localStorage.getItem('cart');
             return data ? JSON.parse(data) : [];
         } catch (e) {
             return [];
@@ -219,12 +292,24 @@
     }
 
     function saveCart(items) {
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+        localStorage.setItem(window.customerCartStorageKey, JSON.stringify(items));
         localStorage.setItem('cart', JSON.stringify(items));
         localStorage.setItem('receipt', JSON.stringify(items));
 
         const cartCount = items.reduce((sum, item) => sum + (item.qty || 0), 0);
         document.querySelectorAll('#cartCount').forEach(el => el.textContent = cartCount);
+    }
+
+    function extractCheckoutError(data) {
+        const errors = data?.errors;
+        if (!errors) return data?.message || '';
+
+        const firstError = Object.values(errors)[0];
+        if (Array.isArray(firstError)) {
+            return firstError[0] || data?.message || '';
+        }
+
+        return firstError || data?.message || '';
     }
 
     function renderCheckoutSummary() {
@@ -297,13 +382,126 @@
         document.getElementById('cartItemsInput').value = JSON.stringify(cartItems);
     }
 
-    // ===== DOM READY =====
-    document.addEventListener('DOMContentLoaded', function() {
-        renderCheckoutSummary();
+    function openBakongModal(payment) {
+        const modal = document.getElementById('bakongPaymentModal');
+        const qrBox = document.getElementById('bakongQrBox');
+        const statusBox = document.getElementById('bakongStatus');
 
+        window.bakongPaymentState.verifyUrl = payment.verify_url;
+        window.bakongPaymentState.orderUrl = payment.order_url;
+        window.bakongPaymentState.isPaid = false;
+        window.bakongPaymentState.isChecking = false;
+
+        document.getElementById('bakongAmount').textContent = '$' + Number(payment.amount || 0).toFixed(2);
+        document.getElementById('bakongReference').textContent = payment.reference_no || ('Order #' + payment.order_id);
+
+        qrBox.innerHTML = '';
+        if (payment.qr_image) {
+            qrBox.innerHTML = `<img src="${payment.qr_image}" alt="Bakong KHQR" class="w-64 h-64 object-contain">`;
+        } else if (window.QRCode && payment.qr_data) {
+            new QRCode(qrBox, {
+                text: payment.qr_data,
+                width: 256,
+                height: 256,
+                colorDark: '#0f172a',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H,
+            });
+        } else {
+            qrBox.innerHTML = `<p class="text-xs font-mono break-all text-slate-500 p-3">${payment.qr_data || 'QR unavailable'}</p>`;
+        }
+
+        statusBox.className = 'mt-5 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-700';
+        statusBox.textContent = 'Waiting for customer payment...';
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (window.bakongPaymentState.interval) {
+            clearInterval(window.bakongPaymentState.interval);
+        }
+
+        setTimeout(verifyBakongPayment, 1500);
+        window.bakongPaymentState.interval = setInterval(verifyBakongPayment, 8000);
+    }
+
+    function closeBakongModal() {
+        const modal = document.getElementById('bakongPaymentModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function verifyBakongPayment() {
+        const state = window.bakongPaymentState;
+        const statusBox = document.getElementById('bakongStatus');
+        const verifyBtn = document.getElementById('manualVerifyBakongBtn');
+
+        if (!state.verifyUrl || state.isChecking || state.isPaid) return;
+
+        state.isChecking = true;
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+        statusBox.className = 'mt-5 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-700';
+        statusBox.textContent = 'Verifying Bakong transaction...';
+
+        fetch(state.verifyUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.is_paid) {
+                state.isPaid = true;
+                clearInterval(state.interval);
+                statusBox.className = 'mt-5 rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-sm text-emerald-700 font-semibold';
+                statusBox.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ទឹកប្រាក់ទូទាត់បានជោគជ័យ';
+
+                localStorage.removeItem('shared_cart');
+                localStorage.removeItem('cart');
+                localStorage.removeItem('receipt');
+                document.querySelectorAll('#cartCount').forEach(el => el.textContent = '0');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ទឹកប្រាក់ទូទាត់បានជោគជ័យ',
+                    text: 'Your order has been sent to the restaurant.',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'View Order',
+                }).then(() => {
+                    window.location.href = data.redirect_url || state.orderUrl;
+                });
+                return;
+            }
+
+            statusBox.className = 'mt-5 rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-700';
+            statusBox.innerHTML = '<i class="fas fa-clock mr-2"></i>' + (data.message || 'Waiting for payment confirmation.');
+        })
+        .catch(() => {
+            statusBox.className = 'mt-5 rounded-xl bg-rose-50 border border-rose-100 px-4 py-3 text-sm text-rose-700';
+            statusBox.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Unable to verify payment right now.';
+        })
+        .finally(() => {
+            state.isChecking = false;
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Check Payment Status';
+        });
+    }
+
+    function initCustomerCheckout() {
+        renderCheckoutSummary();
+        document.getElementById('closeBakongModal')?.addEventListener('click', closeBakongModal);
+        document.getElementById('manualVerifyBakongBtn')?.addEventListener('click', verifyBakongPayment);
+
+        const form = document.getElementById('checkoutForm');
+        if (!form || form.dataset.initialized === 'true') return;
+        form.dataset.initialized = 'true';
 
         // Form validation
-        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        form.addEventListener('submit', function(e) {
             const items = JSON.parse(document.getElementById('cartItemsInput').value || '[]');
             if (items.length === 0) {
                 e.preventDefault();
@@ -318,12 +516,73 @@
                 return;
             }
 
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'cash';
+
             // Disable button to prevent double submit
-            const btn = document.getElementById('placeOrderBtn');
+            const btn = document.getElementById('paymentBtn') || document.getElementById('placeOrderBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            if (paymentMethod !== 'bakong') {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            let bakongStarted = false;
+
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+            })
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) {
+                    throw new Error(data.message || extractCheckoutError(data) || 'Could not create Bakong payment.');
+                }
+
+                if (data.session?.errors) {
+                    throw new Error(extractCheckoutError(data.session) || 'Could not create Bakong payment.');
+                }
+
+                return data;
+            })
+            .then(data => {
+                if (!data.success || !data.payment) {
+                    throw new Error(data.message || extractCheckoutError(data) || 'Could not create Bakong payment.');
+                }
+
+                bakongStarted = true;
+                openBakongModal(data.payment);
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Error',
+                    text: error.message || 'Unable to create Bakong payment.',
+                    confirmButtonColor: '#2563eb',
+                });
+            })
+            .finally(() => {
+                if (!bakongStarted) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+                }
+            });
         });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCustomerCheckout);
+    } else {
+        initCustomerCheckout();
+    }
 
     console.log('🧾 Checkout loaded successfully');
 </script>

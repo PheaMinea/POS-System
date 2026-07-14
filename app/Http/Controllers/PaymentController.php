@@ -18,7 +18,7 @@ class PaymentController extends Controller
             $order = Order::findOrFail($orderId);
 
             $merchant = new IndividualInfo(
-                bakongAccountID: 'chanchav_som@bkrt',
+                bakongAccountID: 'minea_phea1@bkrt',
                 merchantName: 'POS SYSTEM',
                 merchantCity: 'Phnom Penh',
                 currency: KHQRData::CURRENCY_USD,

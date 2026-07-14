@@ -347,7 +347,12 @@
 
 @if($isBakong)
 <script>
-    // ===== Generate KHQR using JavaScript =====
+    window.customerPaymentQr = {
+        data: @json($qr['qr_data'] ?? ''),
+        image: @json($qr['qr_image'] ?? ''),
+    };
+
+    // ===== Generate KHQR using JavaScript fallback =====
     const BAKONG_MERCHANT_ID = '{{ $merchantAccountId }}';
     const MERCHANT_NAME = '{{ $merchantName }}';
     const MERCHANT_CITY = '{{ $merchantCity }}';
@@ -374,7 +379,12 @@
         const qrContainer = document.getElementById('qrcode');
         qrContainer.innerHTML = '';
 
-        const khqrString = generateKHQR();
+        if (window.customerPaymentQr.image) {
+            qrContainer.innerHTML = `<img src="${window.customerPaymentQr.image}" alt="Bakong KHQR" class="w-64 h-64 object-contain">`;
+            return;
+        }
+
+        const khqrString = window.customerPaymentQr.data || generateKHQR();
 
         try {
             // Generate QR code using qrcodejs library
