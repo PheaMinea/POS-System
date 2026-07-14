@@ -8,15 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('status')->default('pending')->after('total_price');
-        });
+        if (!Schema::hasColumn('orders', 'status')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->string('status')
+                    ->default('pending')
+                    ->after('total_price');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('status');
-        });
+        if (Schema::hasColumn('orders', 'status')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->dropColumn('status');
+            });
+        }
     }
 };
