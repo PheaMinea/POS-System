@@ -15,7 +15,7 @@ RUN npm run build
 
 
 # ================================
-# Stage 2: Laravel PHP + Apache
+# Stage 2: Laravel + PHP + Apache
 # ================================
 FROM php:8.4-apache
 
@@ -41,49 +41,28 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Enable Apache rewrite only
+RUN a2enmod rewrite
 
-# ================================
-# Fix Apache MPM
-# ================================
-RUN a2dismod mpm_event || true \
-    && a2dismod mpm_worker || true \
-    && a2enmod mpm_prefork \
-    && a2enmod rewrite
-
-
-# ================================
-# Install Composer
-# ================================
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-
-# ================================
-# Laravel App
-# ================================
 WORKDIR /var/www/html
 
+# Copy Laravel project
 COPY . .
 
-
-# ================================
-# Install PHP Dependencies
-# ================================
+# Install Laravel dependencies
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction \
     --no-scripts
 
-
-# ================================
-# Copy Frontend Build
-# ================================
+# Copy Vite build
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-
-# ================================
-# Laravel Storage Directories
-# ================================
+# Create Laravel directories
 RUN mkdir -p \
     storage/framework/cache/data \
     storage/framework/sessions \
@@ -91,10 +70,7 @@ RUN mkdir -p \
     storage/logs \
     bootstrap/cache
 
-
-# ================================
 # Permissions
-# ================================
 RUN chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/bootstrap/cache \
@@ -102,40 +78,36 @@ RUN chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/bootstrap/cache
 
+# Apache DocumentRoot -> Laravel public
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
-# ================================
-# Apache Document Root
-# ================================
 RUN sed -ri \
-    's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#g' \
-    /etc/apache2/sites-available/000-default.conf
+    -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/sites-available/*.conf
 
+RUN sed -ri \
+    -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/apache2.conf \
+    /etc/apache2/conf-available/*.conf
 
-# ================================
-# Laravel Apache Configuration
-# ================================
-RUN printf '<Directory /var/www/html/public>\n\
-    Options FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>\n' \
+# Laravel Apache config
+RUN printf '%s\n' \
+    '<Directory /var/www/html/public>' \
+    '    Options FollowSymLinks' \
+    '    AllowOverride All' \
+    '    Require all granted' \
+    '</Directory>' \
     > /etc/apache2/conf-available/laravel.conf \
     && a2enconf laravel
 
+# Debug/verify MPM during build
+RUN echo "===== ENABLED MPM MODULES =====" \
+    && ls -la /etc/apache2/mods-enabled/ | grep mpm || true \
+    && echo "===== APACHE MODULES =====" \
+    && apache2ctl -M | grep mpm \
+    && echo "===== APACHE CONFIG TEST =====" \
+    && apache2ctl configtest
 
-# ================================
-# Verify Apache Configuration
-# ================================
-RUN apache2ctl configtest
-
-
-# ================================
-# Railway Port
-# ================================
 EXPOSE 80
 
-
-# ================================
-# Start Apache
-# ================================
 CMD ["apache2-foreground"]
