@@ -17,7 +17,7 @@ RUN npm run build
 # ================================
 # Stage 2: Laravel PHP Apache
 # ================================
-FROM php:8.3-apache
+FROM php:8.4-apache
 
 RUN apt-get update && apt-get install -y \
     git \
