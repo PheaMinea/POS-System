@@ -8,15 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('order_type')->default('walk_in')->after('user_id');
-        });
+        if (!Schema::hasColumn('orders', 'order_type')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->string('order_type')
+                    ->default('walk_in')
+                    ->after('user_id');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('order_type');
-        });
+        if (Schema::hasColumn('orders', 'order_type')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->dropColumn('order_type');
+            });
+        }
     }
 };
