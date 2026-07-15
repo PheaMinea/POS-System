@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use App\Models\Setting;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,9 +22,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Force HTTPS in Production
+        |--------------------------------------------------------------------------
+        |
+        | Force Laravel to generate HTTPS URLs on Railway.
+        |
+        */
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Shop Settings
+        |--------------------------------------------------------------------------
+        */
         try {
             if (Schema::hasTable('settings')) {
                 $settings = Setting::first();
+
                 if (!$settings) {
                     $settings = Setting::create([
                         'shop_name' => 'POS System',
@@ -35,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
                         'vat_percentage' => 0.00,
                     ]);
                 }
+
                 view()->share('shop_settings', $settings);
             }
         } catch (\Exception $e) {
