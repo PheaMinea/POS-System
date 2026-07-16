@@ -1171,7 +1171,7 @@
                             {{-- MY PROFILE --}}
 
                             <a
-                                href="#"
+                                href="{{ route('profile') }}"
                                 class="dropdown-item"
                             >
 
@@ -2690,6 +2690,20 @@
     );
 
 </script>
+
+@if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'Login successful',
+                text: @json(session('success')),
+                timer: 1800,
+                showConfirmButton: false
+            });
+        });
+    </script>
+@endif
 
 
 @stack('scripts')

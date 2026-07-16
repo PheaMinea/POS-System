@@ -13,6 +13,9 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet">
@@ -295,6 +298,13 @@
                 <span>Dashboard</span>
             </a>
 
+            <!-- Homepage -->
+            <a href="{{ route('customer.home') }}"
+               class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-300">
+                <i class="fas fa-house"></i>
+                <span>Homepage</span>
+            </a>
+
             <!-- POS System -->
             <a href="{{ route('cashier.pos.index') }}"
                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-300 {{ request()->routeIs('cashier.pos.*') ? 'active' : '' }}">
@@ -530,6 +540,20 @@
 
     <!-- SPA Router - Prevents page refreshes -->
     <script src="{{ asset('js/spa.js') }}"></script>
+
+    @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login successful',
+                    text: @json(session('success')),
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+            });
+        </script>
+    @endif
 
     @stack('scripts')
 

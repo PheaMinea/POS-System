@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -137,6 +138,20 @@ class AuthController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | SHOW PROFILE PAGE
+    |--------------------------------------------------------------------------
+    */
+
+    public function profile(): View
+    {
+        return view('auth.profile', [
+            'user' => Auth::guard('web')->user(),
+        ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
     | REGISTER STORE
     |--------------------------------------------------------------------------
     |
@@ -246,7 +261,7 @@ class AuthController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function logout(): RedirectResponse
+    public function logout(Request $request): RedirectResponse
     {
         /*
         |--------------------------------------------------------------------------
@@ -263,7 +278,7 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        request()
+        $request
             ->session()
             ->invalidate();
 
@@ -274,7 +289,7 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        request()
+        $request
             ->session()
             ->regenerateToken();
 
@@ -286,6 +301,7 @@ class AuthController extends Controller
         */
 
         return redirect()
-            ->route('login');
+            ->route('login')
+            ->with('success', 'Logged out successfully.');
     }
 }

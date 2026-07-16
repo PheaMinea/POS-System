@@ -116,21 +116,21 @@ class GoogleLoginController extends Controller
 
             if ($user->role === 'admin') {
 
-                return redirect()->route(
-                    'admin.dashboard'
-                );
+                return redirect()
+                    ->route('admin.dashboard')
+                    ->with('success', 'Login successful');
             }
 
             if ($user->role === 'cashier') {
 
-                return redirect()->route(
-                    'cashier.dashboard'
-                );
+                return redirect()
+                    ->route('cashier.dashboard')
+                    ->with('success', 'Login successful');
             }
 
-            return redirect()->route(
-                'customer.home'
-            );
+            return redirect()
+                ->route('customer.home')
+                ->with('success', 'Login successful');
 
         } catch (Exception $e) {
 

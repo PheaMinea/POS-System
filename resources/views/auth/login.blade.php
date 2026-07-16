@@ -113,6 +113,7 @@
 
 <!-- ===== GOOGLE LOGIN ===== -->
 <a href="{{ route('auth.google') }}"
+   id="googleLoginButton"
    class="w-full bg-white border-2 border-slate-200 hover:border-blue-300 text-slate-700 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-3 transition-all duration-200 hover:shadow-md hover:bg-slate-50 group">
     <svg class="w-5 h-5" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -177,6 +178,14 @@
             const form = this.closest('form');
             if (form) form.submit();
         }
+    });
+
+    // ===== GOOGLE LOGIN LOADING STATE =====
+    document.getElementById('googleLoginButton')?.addEventListener('click', function() {
+        this.classList.add('pointer-events-none', 'opacity-75');
+        this.querySelector('span').textContent = 'Logging in...';
+        this.querySelector('.fa-arrow-right')?.classList.replace('fa-arrow-right', 'fa-spinner');
+        this.querySelector('.fa-spinner')?.classList.add('fa-spin');
     });
 
     console.log('🔐 Login page loaded successfully');

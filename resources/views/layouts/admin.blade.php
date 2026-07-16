@@ -12,6 +12,9 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Custom Styles -->
     <style>
         /* Sidebar navigation hover & active states */
@@ -85,6 +88,13 @@
                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="fas fa-chart-pie"></i>
                 <span>Dashboard</span>
+            </a>
+
+            <!-- Homepage -->
+            <a href="{{ route('customer.home') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300">
+                <i class="fas fa-house"></i>
+                <span>Homepage</span>
             </a>
 
             <!-- Users -->
@@ -255,6 +265,18 @@
         <!-- Page Content (yield) -->
         <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 main-scroll">
 
+            @if(session('success'))
+                <div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl flex items-center gap-3">
+                    <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                    <span>{{ session('success') }}</span>
+                    <button type="button"
+                            class="ml-auto text-emerald-400 hover:text-emerald-600 transition"
+                            onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            @endif
+
             <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6">
 
                 @yield('content')
@@ -269,6 +291,20 @@
 
     <!-- SPA Router - Prevents page refreshes -->
     <script src="{{ asset('js/spa.js') }}"></script>
+
+    @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login successful',
+                    text: @json(session('success')),
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+            });
+        </script>
+    @endif
 
     @stack('scripts')
 

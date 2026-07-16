@@ -74,7 +74,7 @@ Route::prefix('customer')
         Route::get('/cart', [CartController::class, 'index'])
             ->name('cart');
 
-        Route::middleware('auth:web')->group(function () {
+        Route::middleware(['auth:web', 'no.cache'])->group(function () {
 
             Route::get('/cart/current', [CartController::class, 'current'])
                 ->name('cart.current');
@@ -127,8 +127,12 @@ Route::middleware('guest:web')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth:web')
+    ->middleware(['auth:web', 'no.cache'])
     ->name('logout');
+
+Route::get('/profile', [AuthController::class, 'profile'])
+    ->middleware(['auth:web', 'no.cache'])
+    ->name('profile');
 
 /*
 |--------------------------------------------------------------------------
@@ -163,7 +167,7 @@ Route::get('/home', function () {
     // Customer role or default
     return redirect()->route('customer.home');
 
-})->middleware('auth:web')->name('home');
+})->middleware(['auth:web', 'no.cache'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -173,7 +177,7 @@ Route::get('/home', function () {
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth:web', 'admin'])
+    ->middleware(['auth:web', 'admin', 'no.cache'])
     ->group(function () {
 
         Route::get('/dashboard', [
@@ -231,7 +235,7 @@ Route::prefix('admin')
 
 Route::prefix('cashier')
     ->name('cashier.')
-    ->middleware(['auth:web', 'cashier'])
+    ->middleware(['auth:web', 'cashier', 'no.cache'])
     ->group(function () {
 
         Route::get('/dashboard', [
