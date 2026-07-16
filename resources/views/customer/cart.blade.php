@@ -490,6 +490,8 @@
 
     const CART_KEY = 'shared_cart';
 
+    const PRODUCT_IMAGES = @json($productImages ?? []);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -1065,6 +1067,25 @@
                     * Number(item.qty);
 
 
+                const productImageUrl =
+                    item.image
+                    || PRODUCT_IMAGES[item.id]
+                    || '';
+
+
+                const productImage =
+                    productImageUrl
+                        ? `
+                            <img
+                                src="${escapeHtml(productImageUrl)}"
+                                alt="${escapeHtml(item.name)}"
+                                class="w-full h-full object-cover"
+                                onerror="this.closest('.cart-product-image').innerHTML = '<i class=&quot;fas fa-utensils text-xl&quot;></i>'"
+                            >
+                        `
+                        : '<i class="fas fa-utensils text-xl"></i>';
+
+
                 html += `
 
                     <div
@@ -1098,10 +1119,12 @@
                                         justify-center
                                         text-blue-500
                                         flex-shrink-0
+                                        overflow-hidden
+                                        cart-product-image
                                     "
                                 >
 
-                                    <i class="fas fa-utensils text-xl"></i>
+                                    ${productImage}
 
                                 </div>
 

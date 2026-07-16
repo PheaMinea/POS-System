@@ -32,9 +32,9 @@
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 @foreach($products as $product)
                     <div class="border rounded-xl p-4 hover:shadow transition">
-                        @if($product->image)
+                        @if($product->image_url)
                             <div class="mb-3 h-28 flex items-center justify-center overflow-hidden rounded-md bg-slate-50">
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="object-cover w-full h-full">
+                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="object-cover w-full h-full">
                             </div>
                         @else
                             <div class="mb-3 h-28 flex items-center justify-center rounded-md bg-slate-50 text-slate-400 font-bold text-2xl">

@@ -25,9 +25,9 @@
         <!-- Content -->
         <div id="productDetail" class="p-8">
             <div class="flex flex-col items-center">
-                @if($product->image)
+                @if($product->image_url)
                     <div class="relative">
-                        <img src="{{ asset('storage/' . $product->image) }}"
+                        <img src="{{ $product->image_url }}"
                              alt="{{ $product->name }}"
                              class="w-48 h-48 rounded-2xl object-cover shadow-lg border-4 border-white">
                         <div class="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-full shadow-lg">

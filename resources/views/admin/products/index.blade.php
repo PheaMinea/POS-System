@@ -99,8 +99,8 @@
                         </td>
 
                         <td class="p-4">
-                            @if($product->image)
-                                <img src="/storage/{{ $product->image }}"
+                            @if($product->image_url)
+                                <img src="{{ $product->image_url }}"
                                      alt="{{ $product->name }}"
                                      class="w-14 h-14 rounded-xl object-cover border-2 border-slate-200 group-hover:border-indigo-300 transition">
                             @else

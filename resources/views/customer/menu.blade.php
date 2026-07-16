@@ -300,6 +300,7 @@
                         data-product-id="{{ $product->id }}"
                         data-product-name="{{ $product->name }}"
                         data-product-price="{{ $product->price }}"
+                        data-product-image="{{ $product->image_url }}"
                     >
 
                         <i class="fas fa-plus"></i>
@@ -377,6 +378,7 @@
                             data-product-id="{{ $product->id }}"
                             data-product-name="{{ $product->name }}"
                             data-product-price="{{ $product->price }}"
+                            data-product-image="{{ $product->image_url }}"
                         >
 
                             <i class="fas fa-cart-plus"></i>
@@ -706,7 +708,8 @@
     function addToCart(
         id,
         name,
-        price
+        price,
+        image
     ) {
 
         /*
@@ -769,6 +772,9 @@
 
                 qty:
                     1,
+
+                image:
+                    image || '',
 
             });
 
@@ -1370,7 +1376,9 @@
 
                 addButton.dataset.productName,
 
-                addButton.dataset.productPrice
+                addButton.dataset.productPrice,
+
+                addButton.dataset.productImage
 
             );
 

@@ -58,8 +58,8 @@
                         <tr class="purchase-item border-b border-slate-100 hover:bg-slate-50 transition">
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
-                                    @if($product->image)
-                                        <img src="{{ asset('storage/'.$product->image) }}"
+                                    @if($product->image_url)
+                                        <img src="{{ $product->image_url }}"
                                              class="w-12 h-12 rounded-xl object-cover border-2 border-slate-200"
                                              alt="{{ $product->name }}">
                                     @else

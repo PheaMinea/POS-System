@@ -100,7 +100,7 @@
                 <div>
                     <label class="block mb-2 text-sm font-semibold text-slate-700">Current Image</label>
                     <img id="preview"
-                         src="{{ $product->image ? asset('storage/' . $product->image) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}"
+                         src="{{ $product->image_url ?: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}"
                          alt="{{ $product->name }}"
                          class="w-40 h-40 rounded-xl object-cover border-2 border-slate-200">
                 </div>

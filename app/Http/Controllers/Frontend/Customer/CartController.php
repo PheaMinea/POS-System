@@ -5,13 +5,22 @@ namespace App\Http\Controllers\Frontend\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Customer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
     public function index()
     {
-        return view('customer.cart');
+        $productImages = Product::query()
+            ->get(['id', 'image'])
+            ->mapWithKeys(function (Product $product) {
+                return [
+                    $product->id => $product->image_url,
+                ];
+            });
+
+        return view('customer.cart', compact('productImages'));
     }
 
     public function current(Request $request)
@@ -56,6 +65,7 @@ class CartController extends Controller
                 'name' => $item->product?->name ?? 'Product #' . $item->product_id,
                 'price' => (float) $item->price,
                 'qty' => (int) $item->quantity,
+                'image' => $item->product?->image_url,
             ];
         });
 

@@ -21,17 +21,29 @@ class Product extends Model
             return null;
         }
 
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        if (str_starts_with($this->image, '/storage/')) {
+            return asset(ltrim($this->image, '/'));
+        }
+
         if (Storage::disk('public')->exists($this->image)) {
-            return Storage::url($this->image);
+            return asset('storage/' . ltrim($this->image, '/'));
         }
 
         $productPath = 'products/' . $this->image;
 
         if (Storage::disk('public')->exists($productPath)) {
-            return Storage::url($productPath);
+            return asset('storage/' . $productPath);
         }
 
-        return null;
+        if (str_contains($this->image, '/')) {
+            return asset('storage/' . ltrim($this->image, '/'));
+        }
+
+        return asset('storage/products/' . $this->image);
     }
 
     public function category()

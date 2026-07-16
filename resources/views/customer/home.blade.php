@@ -904,6 +904,7 @@
                         data-product-id="{{ $product->id }}"
                         data-product-name="{{ $product->name }}"
                         data-product-price="{{ $product->price }}"
+                        data-product-image="{{ $product->image_url }}"
                     >
 
                         <i class="fas fa-plus"></i>
@@ -1027,6 +1028,7 @@
                             data-product-id="{{ $product->id }}"
                             data-product-name="{{ $product->name }}"
                             data-product-price="{{ $product->price }}"
+                            data-product-image="{{ $product->image_url }}"
                         >
 
                             <i class="fas fa-cart-plus"></i>
@@ -1689,7 +1691,8 @@
     function addProductToCart(
         productId,
         productName,
-        productPrice
+        productPrice,
+        productImage
     ) {
 
         let cart =
@@ -1739,7 +1742,10 @@
                 price:
                     price,
 
-                qty: 1
+                qty: 1,
+
+                image:
+                    productImage || ''
 
             });
 
@@ -1888,6 +1894,10 @@
                     button.dataset.productPrice;
 
 
+                const productImage =
+                    button.dataset.productImage;
+
+
                 if (!productId) {
 
                     button.dataset.processing =
@@ -1905,7 +1915,9 @@
 
                     productName,
 
-                    productPrice
+                    productPrice,
+
+                    productImage
 
                 );
 
