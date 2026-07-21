@@ -73,7 +73,9 @@ Route::get('/products/{product}', [
 Route::post('/payments/{id}/verify', [
     PaymentController::class,
     'verify'
-])->name('payments.verify');
+])
+    ->middleware('auth:api')
+    ->name('payments.verify');
 
 /*
 |--------------------------------------------------------------------------

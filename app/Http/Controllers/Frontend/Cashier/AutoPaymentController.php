@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\BakongService;
 use App\Services\TelegramReceiptService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use KHQR\BakongKHQR;
@@ -53,31 +52,6 @@ class AutoPaymentController extends Controller
                     'success' => true,
                     'is_paid' => true,
                     'message' => 'Payment already verified',
-                    'redirect_url' => route('cashier.payments.receipt', $order->id),
-                ]);
-            }
-
-            // Check if order was created more than 30 seconds ago - auto-confirm if so
-            // (customer has had enough time to scan and pay via Bakong app)
-            $createdAt = $order->created_at;
-            $elapsedSeconds = Carbon::now()->diffInSeconds($createdAt);
-            $autoConfirmAfterSeconds = 30;
-
-            if ($elapsedSeconds >= $autoConfirmAfterSeconds) {
-                $order->payment->update(['status' => 'paid']);
-                $order->update(['status' => 'pending']);
-                $this->telegramReceiptService->sendOrderReceipt($order->fresh(['customer', 'user', 'orderItems.product', 'payment']));
-
-                Log::info('Auto Payment Auto-Confirmed after timeout', [
-                    'order_id' => $order->id,
-                    'amount' => $order->total_price,
-                    'elapsed_seconds' => $elapsedSeconds,
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'is_paid' => true,
-                    'message' => 'Payment confirmed!',
                     'redirect_url' => route('cashier.payments.receipt', $order->id),
                 ]);
             }
@@ -329,7 +303,7 @@ class AutoPaymentController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Force verify failed: ' . $e->getMessage(),
+                'message' => 'Force verify failed.',
             ], 500);
         }
     }

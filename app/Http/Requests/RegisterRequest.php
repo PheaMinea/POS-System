@@ -18,9 +18,7 @@ class RegisterRequest extends FormRequest
 
             'email' => 'required|email|max:255|unique:users,email',
 
-            'password' => 'required|string|min:6|max:255|confirmed',
-
-            'role' => 'nullable|in:admin,cashier,customer',
+            'password' => 'required|string|min:8|max:255|confirmed',
 
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
@@ -37,10 +35,8 @@ class RegisterRequest extends FormRequest
             'email.unique' => 'Email already exists.',
 
             'password.required' => 'Password is required.',
-            'password.min' => 'Password must be at least 6 characters.',
+            'password.min' => 'Password must be at least 8 characters.',
             'password.confirmed' => 'Password confirmation does not match.',
-
-            'role.in' => 'Role must be admin, cashier, or customer.',
 
             'image.image' => 'File must be an image.',
             'image.mimes' => 'Image must be jpg, jpeg, png, or webp.',

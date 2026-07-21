@@ -344,7 +344,7 @@ class PaymentController extends BaseApiController
             return response()->json([
                 'success' => false,
                 'status' => 'pending',
-                'message' => $e->getMessage(),
+                'message' => 'Unable to verify payment right now.',
             ], 500);
         }
     }

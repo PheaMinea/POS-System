@@ -19,8 +19,7 @@ class AuthController extends BaseApiController
             $request->validate([
                 'name'                  => 'required|string|max:255',
                 'email'                 => 'required|email|unique:users,email',
-                'password'              => 'required|min:6|confirmed',
-                'role'                  => 'required|in:admin,cashier',
+                'password'              => 'required|min:8|confirmed',
                 'image'                 => 'nullable|string',
             ]);
 
@@ -28,7 +27,7 @@ class AuthController extends BaseApiController
                 'name'      => $request->name,
                 'email'     => $request->email,
                 'password'  => Hash::make($request->password),
-                'role'      => $request->role,
+                'role'      => 'customer',
                 'image'     => $request->image,
             ]);
 

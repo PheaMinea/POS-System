@@ -43,6 +43,7 @@ return [
         'merchant_id' => env('BAKONG_MERCHANT_ID'),
         'merchant_account_id' => env('BAKONG_MERCHANT_ACCOUNT_ID'),
         'customer_auto_confirm' => env('BAKONG_CUSTOMER_AUTO_CONFIRM', false),
+        'http_verify' => env('BAKONG_HTTP_VERIFY', true),
     ],
 
     /*
@@ -68,7 +69,7 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
         'guzzle' => [
-            'verify' => false,
+            'verify' => env('GOOGLE_HTTP_VERIFY', true),
         ],
     ],
 

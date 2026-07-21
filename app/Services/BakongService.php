@@ -50,7 +50,7 @@ class BakongService
             ];
 
             $response = Http::withOptions([
-                'verify' => false,
+                'verify' => config('services.bakong.http_verify', true),
                 'timeout' => 30,
             ])
             ->withHeaders([
@@ -197,7 +197,7 @@ class BakongService
     {
         try {
             $response = Http::withOptions([
-                'verify' => false, // Disable SSL verification for development
+                'verify' => config('services.bakong.http_verify', true),
                 'timeout' => 30,
             ])
             ->withHeaders([
