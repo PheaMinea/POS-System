@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $shop_settings->shop_name ?? 'POS' }} Admin - @yield('title', 'Dashboard')</title>
-    <link rel="icon" href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.ico') }}">
+    <link rel="icon" href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.svg') }}">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>

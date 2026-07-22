@@ -177,7 +177,7 @@
             const total = parseFloat(order.total_price || 0).toFixed(2);
             new Notification('🆕 New Order #' + order.id, {
                 body: customerName + ' - $' + total + ' - ' + (order.orderItems?.length || order.order_items?.length || 0) + ' items',
-                icon: '/favicon.ico',
+                icon: '/favicon.svg',
                 tag: 'order-' + order.id,
             });
         }

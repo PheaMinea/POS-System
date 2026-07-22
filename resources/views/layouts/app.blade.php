@@ -23,7 +23,7 @@
 
     <link
         rel="icon"
-        href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.ico') }}"
+        href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.svg') }}"
     >
 
 
@@ -366,6 +366,19 @@
             flex: 1;
 
             max-width: 400px;
+
+        }
+
+
+        .nav-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            flex-shrink: 0;
 
         }
 
@@ -805,17 +818,111 @@
 
         @media (max-width: 768px) {
 
+            .navbar {
+
+                padding:
+                    0.7rem 0;
+
+            }
+
+
             .top-bar {
+
+                padding:
+                    0.35rem 0;
+
+            }
+
+
+            .top-bar > div > div {
+
+                gap: 0.5rem;
+
+            }
+
+
+            .top-bar .flex-1 {
 
                 display: none;
 
             }
 
 
-            .navbar {
+            .announcement-text {
+
+                flex: 1;
+
+                min-width: 0;
+
+                justify-content: flex-start;
+
+                gap: 0.45rem;
+
+                flex-wrap: nowrap;
+
+                overflow: hidden;
+
+                white-space: nowrap;
+
+                font-size: 0.72rem;
+
+            }
+
+
+            .announcement-text > span:first-of-type {
+
+                min-width: 0;
+
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+
+            }
+
+
+            .announcement-text .highlight {
+
+                flex-shrink: 0;
 
                 padding:
-                    0.55rem 0;
+                    0.12rem
+                    0.55rem;
+
+            }
+
+
+            .announcement-text > span:nth-of-type(3),
+            .announcement-text > i:last-child {
+
+                display: none;
+
+            }
+
+
+            .close-btn {
+
+                width: 24px;
+
+                height: 24px;
+
+                flex: 0 0 24px;
+
+                font-size: 0.75rem;
+
+            }
+
+
+            .customer-nav-row {
+
+                display: grid;
+
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    auto;
+
+                gap: 0.7rem;
+
+                align-items: center;
 
             }
 
@@ -846,9 +953,24 @@
 
                 width: 100%;
 
-                flex: none;
+                grid-column: 1 / -1;
 
-                order: 3;
+                order: initial;
+
+            }
+
+
+            .search-wrapper input {
+
+                min-height: 42px;
+
+                padding:
+                    0.6rem
+                    2.75rem
+                    0.6rem
+                    2.55rem;
+
+                border-radius: 14px;
 
             }
 
@@ -872,9 +994,9 @@
             .cart-btn,
             .auth-btn {
 
-                width: 40px;
+                width: 38px;
 
-                height: 40px;
+                height: 38px;
 
                 justify-content: center;
 
@@ -912,6 +1034,39 @@
             .dropdown-wrapper {
 
                 position: static;
+
+            }
+
+
+            .nav-actions {
+
+                justify-self: end;
+
+                gap: 0.45rem;
+
+            }
+
+
+            #mobileToggle {
+
+                width: 38px;
+
+                height: 38px;
+
+                display: inline-flex;
+
+                align-items: center;
+
+                justify-content: center;
+
+                padding: 0;
+
+                border-radius: 999px;
+
+                background: #f1f5f9;
+
+                border:
+                    1px solid #e2e8f0;
 
             }
 
@@ -959,19 +1114,50 @@
 
             .logo-text {
 
-                max-width: 6.75rem;
+                font-size: 0.95rem;
+
+                max-width: 8.5rem;
 
             }
 
             .navbar .flex.flex-wrap.items-center.justify-between {
 
-                flex-wrap: nowrap;
+                flex-wrap: wrap;
 
             }
 
             .navbar a.flex-shrink-0 {
 
                 min-width: 0;
+
+            }
+
+        }
+
+
+        @media (max-width: 360px) {
+
+            .logo-text {
+
+                max-width: 7rem;
+
+            }
+
+
+            .announcement-text {
+
+                font-size: 0.68rem;
+
+            }
+
+
+            .cart-btn,
+            .auth-btn,
+            #mobileToggle {
+
+                width: 36px;
+
+                height: 36px;
 
             }
 
@@ -1077,7 +1263,7 @@
     >
 
         <div
-            class="flex flex-wrap items-center justify-between gap-3"
+            class="customer-nav-row flex flex-wrap items-center justify-between gap-3"
         >
 
 
@@ -1206,9 +1392,7 @@
             {{-- RIGHT SIDE --}}
             {{-- ================================================== --}}
 
-            <div
-                class="flex items-center gap-2 sm:gap-3 flex-shrink-0"
-            >
+            <div class="nav-actions">
 
 
                 {{-- ============================================== --}}
