@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Admin - @yield('title', 'Dashboard')</title>
+    <title>{{ $shop_settings->shop_name ?? 'POS' }} Admin - @yield('title', 'Dashboard')</title>
+    <link rel="icon" href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.ico') }}">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -55,15 +56,98 @@
             transform: translateY(-4px);
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.02);
         }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        .sidebar-toggle,
+        .sidebar-overlay {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: inline-flex;
+            }
+
+            .admin-sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+                width: 280px;
+                max-width: calc(100vw - 2rem);
+                transition: left 0.25s ease;
+                box-shadow: 4px 0 30px rgba(15, 23, 42, 0.25);
+            }
+
+            .admin-sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 999;
+                background: rgba(15, 23, 42, 0.45);
+                backdrop-filter: blur(3px);
+            }
+
+            .sidebar-overlay.open {
+                display: block;
+            }
+
+            .admin-header {
+                padding: 0.875rem 1rem;
+            }
+
+            .admin-header-title {
+                min-width: 0;
+            }
+
+            .admin-header-title h1 {
+                font-size: 1.25rem;
+                line-height: 1.75rem;
+            }
+
+            .admin-header-title p {
+                max-width: 12rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .admin-header-actions {
+                gap: 0.75rem;
+                margin-left: auto;
+            }
+
+            .admin-header-profile-name {
+                display: none;
+            }
+
+            .admin-main {
+                padding: 1rem !important;
+            }
+
+            .admin-content-card {
+                padding: 1rem !important;
+                border-radius: 1rem;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-slate-100 antialiased font-sans">
 
+<div class="sidebar-overlay" id="adminSidebarOverlay"></div>
+
 <div class="flex h-screen overflow-hidden">
 
     <!-- ==================== SIDEBAR ==================== -->
-    <aside class="w-72 bg-slate-900 text-white flex flex-col flex-shrink-0">
+    <aside class="admin-sidebar w-72 bg-slate-900 text-white flex flex-col flex-shrink-0" id="adminSidebar">
 
         <!-- Brand / Logo -->
         <div class="h-20 flex items-center px-6 border-b border-slate-800">
@@ -193,24 +277,32 @@
     </aside>
 
     <!-- ==================== MAIN CONTENT ==================== -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
 
         <!-- Header -->
         <header class="bg-white border-b border-slate-200 flex-shrink-0">
-            <div class="flex flex-wrap justify-between items-center px-6 lg:px-8 py-4 gap-3">
+            <div class="admin-header flex flex-wrap justify-between items-center px-6 lg:px-8 py-4 gap-3">
 
                 <!-- Page Title -->
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-800">
+                <div class="admin-header-title flex min-w-0 flex-1 items-center gap-3">
+                    <button type="button"
+                            class="sidebar-toggle w-10 h-10 rounded-xl border border-slate-200 text-slate-600 items-center justify-center hover:bg-slate-50 transition"
+                            onclick="toggleAdminSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="min-w-0">
+                    <h1 class="truncate text-2xl font-bold text-slate-800">
                         @yield('page_title', 'Dashboard')
                     </h1>
-                    <p class="text-sm text-slate-500">
+                    <p class="truncate text-sm text-slate-500">
                         Welcome back 👋 {{ auth()->user()->name ?? 'Admin' }}
                     </p>
                 </div>
 
+                </div>
+
                 <!-- Right Side: Search, Notifications, Profile -->
-                <div class="flex items-center gap-4 lg:gap-5 flex-wrap">
+                <div class="admin-header-actions flex flex-shrink-0 flex-wrap items-center justify-end gap-4 lg:gap-5">
 
                     <!-- Search Bar -->
                     <div class="relative hidden sm:block">
@@ -249,7 +341,7 @@
                                 {{ strtoupper(substr($authUser->name ?? 'A', 0, 1)) }}
                             </div>
                         @endif
-                        <div class="hidden sm:block">
+                        <div class="admin-header-profile-name hidden sm:block">
                             <h4 class="font-semibold text-sm text-slate-800">
                                 {{ $authUser->name ?? 'Admin' }}
                             </h4>
@@ -263,7 +355,7 @@
         </header>
 
         <!-- Page Content (yield) -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 main-scroll">
+        <main class="admin-main flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 main-scroll">
 
             @if(session('success'))
                 <div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl flex items-center gap-3">
@@ -277,7 +369,7 @@
                 </div>
             @endif
 
-            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6">
+            <div class="admin-content-card bg-white rounded-2xl shadow-sm p-4 md:p-6">
 
                 @yield('content')
 
@@ -291,6 +383,27 @@
 
     <!-- SPA Router - Prevents page refreshes -->
     <script src="{{ asset('js/spa.js') }}"></script>
+
+    <script>
+        function toggleAdminSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('adminSidebarOverlay');
+
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        document.getElementById('adminSidebarOverlay').addEventListener('click', toggleAdminSidebar);
+
+        document.addEventListener('keydown', function (event) {
+            const sidebar = document.getElementById('adminSidebar');
+
+            if (event.key === 'Escape' && sidebar.classList.contains('open')) {
+                toggleAdminSidebar();
+            }
+        });
+    </script>
 
     @if(session('success'))
         <script>

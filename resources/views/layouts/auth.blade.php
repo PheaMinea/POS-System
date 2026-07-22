@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'POS System Authentication')</title>
+    <title>@yield('title', ($shop_settings->shop_name ?? 'POS System') . ' Authentication')</title>
+    <link rel="icon" href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.ico') }}">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -246,12 +247,20 @@
                         mx-auto logo-pulse
                         border border-white/20
                         shadow-2xl shadow-blue-500/20">
-                <i class="fas fa-cash-register text-6xl"></i>
+                @if(isset($shop_settings) && $shop_settings->shop_logo)
+                    <img
+                        src="{{ asset('storage/' . $shop_settings->shop_logo) }}"
+                        alt="{{ $shop_settings->shop_name ?? 'Website logo' }}"
+                        class="w-full h-full object-contain p-4"
+                    >
+                @else
+                    <i class="fas fa-cash-register text-6xl"></i>
+                @endif
             </div>
 
             <!-- Title -->
             <h1 class="text-5xl font-extrabold mt-8 tracking-tight bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                POS System
+                {{ $shop_settings->shop_name ?? 'POS System' }}
             </h1>
 
             <p class="text-xl text-blue-200/80 mt-4 font-light">
@@ -370,7 +379,7 @@
             <!-- Footer -->
             <div class="text-center mt-6">
                 <p class="text-xs text-slate-400 font-light">
-                    &copy; {{ date('Y') }} POS System.
+                    &copy; {{ date('Y') }} {{ $shop_settings->shop_name ?? 'POS System' }}.
                     <span class="hidden sm:inline">All rights reserved.</span>
                 </p>
             </div>

@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Cashier Dashboard')</title>
+    <title>@yield('title', ($shop_settings->shop_name ?? 'POS') . ' Cashier Dashboard')</title>
+    <link rel="icon" href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.ico') }}">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -364,7 +365,7 @@
     <!-- ============================================================ -->
     <!-- MAIN CONTENT -->
     <!-- ============================================================ -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
 
         <!-- Header -->
         <header class="header flex-shrink-0">
@@ -390,7 +391,7 @@
                 </div>
 
                 <!-- Right -->
-                <div class="flex items-center gap-4 md:gap-5">
+                <div class="flex flex-shrink-0 items-center justify-end gap-3 md:gap-5">
 
                     <!-- Search -->
                     <div class="relative hidden md:block search-box">
@@ -411,7 +412,7 @@
 
                     <!-- Quick Customers Link -->
                     <a href="{{ route('cashier.customers.index') }}"
-                       class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 transition">
+                       class="hidden items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 transition sm:inline-flex">
                         <i class="fas fa-users"></i>
                         <span>Customers</span>
                     </a>
@@ -454,7 +455,7 @@
         </header>
 
         <!-- Content -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 main-scroll">
+        <main class="main-content flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 main-scroll">
 
             <!-- Success Message -->
             @if(session('success'))
@@ -481,7 +482,7 @@
             @endif
 
             <!-- Content Wrapper -->
-            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6 lg:p-8 border border-slate-100/50">
+            <div class="content-wrapper bg-white rounded-2xl shadow-sm p-4 md:p-6 lg:p-8 border border-slate-100/50">
 
                 @yield('content')
 

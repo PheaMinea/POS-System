@@ -26,7 +26,7 @@
 
             </div>
 
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold">
 
                 Delicious
 
@@ -94,10 +94,10 @@
 
     <div class="bg-white rounded-2xl shadow-xl p-4 md:p-6 border border-slate-100">
 
-        <div class="flex flex-wrap items-center gap-4">
+        <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-4">
 
             <!-- SEARCH -->
-            <div class="flex-1 min-w-[200px] relative">
+            <div class="w-full sm:flex-1 sm:min-w-[200px] relative">
 
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
 
@@ -115,7 +115,7 @@
             <!-- CATEGORY -->
             <select
                 id="categoryFilter"
-                class="border border-slate-200 rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition outline-none bg-white text-slate-700 appearance-none cursor-pointer"
+                class="w-full sm:w-auto border border-slate-200 rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition outline-none bg-white text-slate-700 appearance-none cursor-pointer"
             >
 
                 <option value="all">
@@ -860,7 +860,7 @@
 
 
         toast.className =
-            'menu-cart-toast fixed top-20 right-4 z-[9999]';
+            'menu-cart-toast fixed top-20 left-4 right-4 sm:left-auto sm:right-4 z-[9999]';
 
 
         toast.innerHTML = `
@@ -876,7 +876,9 @@
                     flex
                     items-center
                     gap-3
-                    min-w-[280px]
+                    w-full
+                    sm:w-auto
+                    sm:min-w-[280px]
                 "
             >
 

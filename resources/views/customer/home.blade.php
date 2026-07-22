@@ -143,7 +143,7 @@
                     class="
                         text-4xl
                         sm:text-5xl
-                        md:text-6xl
+                        lg:text-6xl
                         font-extrabold
                         leading-tight
                     "
@@ -187,12 +187,15 @@
                         flex
                         flex-wrap
                         gap-4
+                        sm:items-center
                     "
                 >
 
                     <a
                         href="{{ route('customer.menu') }}"
                         class="
+                            w-full
+                            sm:w-auto
                             bg-white
                             text-blue-600
                             hover:bg-blue-50
@@ -203,6 +206,7 @@
                             transition
                             flex
                             items-center
+                            justify-center
                             gap-2
                             shadow-lg
                             shadow-blue-500/30
@@ -227,6 +231,8 @@
                     <a
                         href="#categories"
                         class="
+                            w-full
+                            sm:w-auto
                             bg-white/20
                             backdrop-blur-sm
                             hover:bg-white/30
@@ -1568,7 +1574,10 @@
         toast.className = `
             fixed
             top-24
-            right-5
+            left-4
+            right-4
+            sm:left-auto
+            sm:right-5
             z-[9999]
             bg-white
             border
@@ -1576,8 +1585,9 @@
             rounded-2xl
             shadow-2xl
             p-4
-            min-w-[300px]
-            max-w-sm
+            w-auto
+            sm:min-w-[300px]
+            sm:max-w-sm
         `;
 
 

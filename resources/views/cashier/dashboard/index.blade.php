@@ -10,19 +10,19 @@
     <!-- ============================================================ -->
     <!-- HEADER -->
     <!-- ============================================================ -->
-    <div class="flex flex-wrap justify-between items-center gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">
+    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div class="min-w-0">
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight sm:text-3xl">
                 <i class="fas fa-gauge-high text-blue-500 mr-3"></i>Cashier Dashboard
             </h1>
-            <p class="text-slate-400 mt-1">
+            <p class="mt-1 truncate text-slate-400">
                 <i class="fas fa-circle text-[6px] text-blue-400 mr-2 align-middle"></i>
                 Welcome back, {{ auth()->user()->name ?? 'Cashier' }}
             </p>
         </div>
 
         <a href="{{ route('cashier.pos.index') }}"
-           class="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-medium transition flex items-center gap-2.5 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/35">
+           class="flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-blue-700 px-6 py-3 font-medium text-white shadow-lg shadow-blue-500/25 transition hover:from-blue-600 hover:to-blue-800 hover:shadow-blue-500/35 sm:w-auto">
             <i class="fas fa-cash-register text-lg"></i>
             Open POS
             <i class="fas fa-arrow-right text-sm opacity-70"></i>
@@ -32,103 +32,103 @@
     <!-- ============================================================ -->
     <!-- STATISTICS CARDS -->
     <!-- ============================================================ -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
 
         <!-- Products -->
-        <div class="stat-card bg-white rounded-2xl shadow-sm p-5">
+        <div class="stat-card bg-white rounded-2xl shadow-sm p-4 md:p-5">
             <div class="flex justify-between items-start">
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">
                         <i class="fas fa-circle text-[6px] text-blue-400 mr-1.5 align-middle"></i>
                         Products
                     </p>
                     <h2 id="totalProducts"
-                        class="text-3xl font-bold text-blue-600 mt-1.5">
+                        class="mt-1.5 break-words text-2xl font-bold text-blue-600 md:text-3xl">
                         {{ $dashboard['total_products'] ?? 0 }}
                     </h2>
                     <p class="text-xs text-slate-400 mt-1">Available inventory</p>
                 </div>
-                <div class="icon-wrapper w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <div class="icon-wrapper flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50">
                     <i class="fas fa-box text-blue-500 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Customers -->
-        <div class="stat-card bg-white rounded-2xl shadow-sm p-5">
+        <div class="stat-card bg-white rounded-2xl shadow-sm p-4 md:p-5">
             <div class="flex justify-between items-start">
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">
                         <i class="fas fa-circle text-[6px] text-blue-400 mr-1.5 align-middle"></i>
                         Customers
                     </p>
                     <h2 id="totalCustomers"
-                        class="text-3xl font-bold text-blue-600 mt-1.5">
+                        class="mt-1.5 break-words text-2xl font-bold text-blue-600 md:text-3xl">
                         {{ $dashboard['total_customers'] ?? 0 }}
                     </h2>
                     <p class="text-xs text-slate-400 mt-1">Customer records</p>
                 </div>
-                <div class="icon-wrapper w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <div class="icon-wrapper flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50">
                     <i class="fas fa-users text-blue-500 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Orders -->
-        <div class="stat-card bg-white rounded-2xl shadow-sm p-5">
+        <div class="stat-card bg-white rounded-2xl shadow-sm p-4 md:p-5">
             <div class="flex justify-between items-start">
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">
                         <i class="fas fa-circle text-[6px] text-amber-400 mr-1.5 align-middle"></i>
                         Orders
                     </p>
                     <h2 id="totalOrders"
-                        class="text-3xl font-bold text-amber-600 mt-1.5">
+                        class="mt-1.5 break-words text-2xl font-bold text-amber-600 md:text-3xl">
                         {{ $dashboard['total_orders'] ?? 0 }}
                     </h2>
                     <p class="text-xs text-slate-400 mt-1">Your cashier orders</p>
                 </div>
-                <div class="icon-wrapper w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                <div class="icon-wrapper flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50">
                     <i class="fas fa-cart-shopping text-amber-500 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Sales -->
-        <div class="stat-card bg-white rounded-2xl shadow-sm p-5">
+        <div class="stat-card bg-white rounded-2xl shadow-sm p-4 md:p-5">
             <div class="flex justify-between items-start">
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">
                         <i class="fas fa-circle text-[6px] text-rose-400 mr-1.5 align-middle"></i>
                         Sales
                     </p>
                     <h2 id="totalSales"
-                        class="text-3xl font-bold text-rose-600 mt-1.5">
+                        class="mt-1.5 break-words text-2xl font-bold text-rose-600 md:text-3xl">
                         ${{ number_format($dashboard['total_sales'] ?? 0, 2) }}
                     </h2>
                     <p class="text-xs text-slate-400 mt-1">Your cashier sales</p>
                 </div>
-                <div class="icon-wrapper w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center">
+                <div class="icon-wrapper flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-rose-50">
                     <i class="fas fa-dollar-sign text-rose-500 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Purchases -->
-        <div class="stat-card bg-white rounded-2xl shadow-sm p-5">
+        <div class="stat-card bg-white rounded-2xl shadow-sm p-4 md:p-5">
             <div class="flex justify-between items-start">
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">
                         <i class="fas fa-circle text-[6px] text-purple-400 mr-1.5 align-middle"></i>
                         Purchases
                     </p>
                     <h2 id="totalPurchases"
-                        class="text-3xl font-bold text-purple-600 mt-1.5">
+                        class="mt-1.5 break-words text-2xl font-bold text-purple-600 md:text-3xl">
                         ${{ number_format($dashboard['total_purchases'] ?? 0, 2) }}
                     </h2>
                     <p class="text-xs text-slate-400 mt-1">Total shop purchases</p>
                 </div>
-                <div class="icon-wrapper w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                <div class="icon-wrapper flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-purple-50">
                     <i class="fas fa-truck text-purple-500 text-xl"></i>
                 </div>
             </div>
@@ -142,7 +142,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Quick Actions -->
-        <div class="bg-white rounded-2xl shadow-sm p-6">
+        <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6">
             <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
                 <i class="fas fa-bolt text-blue-500"></i>
                 Quick Actions
@@ -153,9 +153,9 @@
                     <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white">
                         <i class="fas fa-cash-register"></i>
                     </div>
-                    <div>
-                        <p class="font-medium text-slate-700 group-hover:text-blue-600 transition">New Sale</p>
-                        <p class="text-xs text-slate-400">Start a new transaction</p>
+                    <div class="min-w-0">
+                        <p class="font-medium text-slate-700 transition group-hover:text-blue-600">New Sale</p>
+                        <p class="truncate text-xs text-slate-400">Start a new transaction</p>
                     </div>
                     <i class="fas fa-arrow-right ml-auto text-slate-300 group-hover:text-blue-500 transition"></i>
                 </a>
@@ -165,9 +165,9 @@
                     <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white">
                         <i class="fas fa-user-plus"></i>
                     </div>
-                    <div>
-                        <p class="font-medium text-slate-700 group-hover:text-blue-600 transition">Add Customer</p>
-                        <p class="text-xs text-slate-400">Create new customer profile</p>
+                    <div class="min-w-0">
+                        <p class="font-medium text-slate-700 transition group-hover:text-blue-600">Add Customer</p>
+                        <p class="truncate text-xs text-slate-400">Create new customer profile</p>
                     </div>
                     <i class="fas fa-arrow-right ml-auto text-slate-300 group-hover:text-blue-500 transition"></i>
                 </a>
@@ -177,9 +177,9 @@
                     <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-white">
                         <i class="fas fa-receipt"></i>
                     </div>
-                    <div>
-                        <p class="font-medium text-slate-700 group-hover:text-amber-600 transition">View Orders</p>
-                        <p class="text-xs text-slate-400">Check recent orders</p>
+                    <div class="min-w-0">
+                        <p class="font-medium text-slate-700 transition group-hover:text-amber-600">View Orders</p>
+                        <p class="truncate text-xs text-slate-400">Check recent orders</p>
                     </div>
                     <i class="fas fa-arrow-right ml-auto text-slate-300 group-hover:text-amber-500 transition"></i>
                 </a>
@@ -187,8 +187,8 @@
         </div>
 
         <!-- Recent Sales -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6">
-            <div class="flex justify-between items-center mb-4">
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-4 md:p-6">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <h3 class="font-semibold text-slate-800 flex items-center gap-2">
                     <i class="fas fa-clock-rotate-left text-blue-500"></i>
                     Recent Sales
@@ -214,7 +214,7 @@
                             default => 'text-amber-600',
                         };
                     @endphp
-                    <div class="flex items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div class="flex flex-col gap-3 rounded-xl bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
                                 {{ strtoupper(substr($customerName, 0, 1)) }}
@@ -228,7 +228,7 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="text-right flex-shrink-0">
+                        <div class="flex-shrink-0 sm:text-right">
                             <p class="font-bold {{ $amountClass }}">${{ number_format($order->total_price, 2) }}</p>
                             <span class="text-xs {{ $statusClass }} px-2 py-0.5 rounded-full">{{ ucfirst($status) }}</span>
                         </div>

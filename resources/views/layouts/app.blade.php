@@ -18,8 +18,13 @@
     >
 
     <title>
-        @yield('title', 'FoodRestaurant')
+        @yield('title', $shop_settings->shop_name ?? 'FoodRestaurant')
     </title>
+
+    <link
+        rel="icon"
+        href="{{ isset($shop_settings) && $shop_settings->shop_logo ? asset('storage/' . $shop_settings->shop_logo) : asset('favicon.ico') }}"
+    >
 
 
     {{-- ============================================================ --}}
@@ -72,6 +77,8 @@
             background: #f8fafc;
 
             color: #1e293b;
+
+            overflow-x: hidden;
 
         }
 
@@ -245,6 +252,19 @@
 
             color: white;
 
+            overflow: hidden;
+
+        }
+
+
+        .logo-icon img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
         }
 
 
@@ -255,6 +275,16 @@
             font-weight: 800;
 
             color: #0f172a;
+
+            min-width: 0;
+
+            max-width: 14rem;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
 
         }
 
@@ -775,6 +805,41 @@
 
         @media (max-width: 768px) {
 
+            .top-bar {
+
+                display: none;
+
+            }
+
+
+            .navbar {
+
+                padding:
+                    0.55rem 0;
+
+            }
+
+
+            .navbar > div > div {
+
+                gap: 0.5rem;
+
+            }
+
+
+            .logo-icon {
+
+                width: 32px;
+
+                height: 32px;
+
+                border-radius: 7px;
+
+                flex: 0 0 32px;
+
+            }
+
+
             .search-wrapper {
 
                 max-width: 100%;
@@ -798,6 +863,115 @@
             .logo-text {
 
                 font-size: 1rem;
+
+                max-width: 9rem;
+
+            }
+
+
+            .cart-btn,
+            .auth-btn {
+
+                width: 40px;
+
+                height: 40px;
+
+                justify-content: center;
+
+                padding: 0;
+
+                border-radius: 999px;
+
+            }
+
+
+            .cart-btn {
+
+                position: relative;
+
+            }
+
+
+            .cart-badge {
+
+                position: absolute;
+
+                top: -6px;
+
+                right: -6px;
+
+                min-width: 18px;
+
+                height: 18px;
+
+                font-size: 0.6rem;
+
+            }
+
+
+            .dropdown-wrapper {
+
+                position: static;
+
+            }
+
+
+            .dropdown-menu {
+
+                position: fixed;
+
+                left: 1rem;
+
+                right: 1rem;
+
+                top: 4.5rem;
+
+                width: auto;
+
+                min-width: 0;
+
+                max-height: calc(100vh - 6rem);
+
+                overflow-y: auto;
+
+            }
+
+
+            .mobile-menu-open {
+
+                max-height: calc(100vh - 5rem);
+
+                overflow-y: auto;
+
+            }
+
+
+            .footer {
+
+                margin-top: 2.5rem;
+
+            }
+
+        }
+
+
+        @media (max-width: 420px) {
+
+            .logo-text {
+
+                max-width: 6.75rem;
+
+            }
+
+            .navbar .flex.flex-wrap.items-center.justify-between {
+
+                flex-wrap: nowrap;
+
+            }
+
+            .navbar a.flex-shrink-0 {
+
+                min-width: 0;
 
             }
 
@@ -844,7 +1018,7 @@
                     Welcome to
 
                     <strong>
-                        FoodRestaurant
+                        {{ $shop_settings->shop_name ?? 'FoodRestaurant' }}
                     </strong>
 
                 </span>
@@ -918,14 +1092,25 @@
 
                 <div class="logo-icon">
 
-                    <i class="fas fa-utensils"></i>
+                    @if(isset($shop_settings) && $shop_settings->shop_logo)
+
+                        <img
+                            src="{{ asset('storage/' . $shop_settings->shop_logo) }}"
+                            alt="{{ $shop_settings->shop_name ?? 'Website logo' }}"
+                        >
+
+                    @else
+
+                        <i class="fas fa-utensils"></i>
+
+                    @endif
 
                 </div>
 
 
                 <span class="logo-text">
 
-                    Food<span class="highlight">Restaurant</span>
+                    {{ $shop_settings->shop_name ?? 'FoodRestaurant' }}
 
                 </span>
 
@@ -1779,9 +1964,21 @@
                         "
                     >
 
-                        <i
-                            class="fas fa-utensils text-white"
-                        ></i>
+                        @if(isset($shop_settings) && $shop_settings->shop_logo)
+
+                            <img
+                                src="{{ asset('storage/' . $shop_settings->shop_logo) }}"
+                                alt="{{ $shop_settings->shop_name ?? 'Website logo' }}"
+                                class="w-full h-full object-contain"
+                            >
+
+                        @else
+
+                            <i
+                                class="fas fa-utensils text-white"
+                            ></i>
+
+                        @endif
 
                     </div>
 
@@ -1790,7 +1987,7 @@
                         class="text-xl font-bold"
                     >
 
-                        Food<span class="text-blue-600">Restaurant</span>
+                        {{ $shop_settings->shop_name ?? 'FoodRestaurant' }}
 
                     </span>
 
@@ -1905,7 +2102,7 @@
                             class="fas fa-map-pin text-blue-600 mr-2"
                         ></i>
 
-                        Phnom Penh, Cambodia
+                        {{ $shop_settings->shop_address ?? 'Phnom Penh, Cambodia' }}
 
                     </p>
 
@@ -1916,7 +2113,7 @@
                             class="fas fa-phone text-blue-600 mr-2"
                         ></i>
 
-                        +855 12 345 678
+                        {{ $shop_settings->shop_phone ?? '+855 12 345 678' }}
 
                     </p>
 
@@ -1927,7 +2124,7 @@
                             class="fas fa-envelope text-blue-600 mr-2"
                         ></i>
 
-                        info@foodrestaurant.com
+                        {{ $shop_settings->shop_email ?? 'info@foodrestaurant.com' }}
 
                     </p>
 
@@ -1949,7 +2146,7 @@
             "
         >
 
-            © {{ date('Y') }} FoodRestaurant.
+            &copy; {{ date('Y') }} {{ $shop_settings->shop_name ?? 'FoodRestaurant' }}.
             All rights reserved.
 
         </div>
